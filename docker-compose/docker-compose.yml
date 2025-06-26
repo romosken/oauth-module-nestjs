@@ -1,0 +1,27 @@
+services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=secretsmanager
+
+  create-resources:
+    volumes:
+      - "./secrets.json:/tmp/secrets.json"
+      - "./create-resources.sh:/tmp/create-resources.sh"
+    restart: "no"
+    image: amazon/aws-cli:latest
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      - HOSTNAME=localstack
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=localstack
+      - AWS_SECRET_ACCESS_KEY=localstack
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - ENV=local
+    working_dir: /tmp
+    entrypoint: ["sh", "/tmp/create-resources.sh"]
