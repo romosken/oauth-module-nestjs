@@ -1,1 +1,1 @@
-aws secrestmanager create-secret --name oauth-module/secrets --region us-east-1 --secret-string file://secrets.json &&
+aws secretsmanager create-secret --name oauth-module/secrets --region us-east-1 --secret-string file://secrets.json
