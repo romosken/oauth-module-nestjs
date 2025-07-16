@@ -15,7 +15,7 @@ export class UserResponseDto {
 
   email: string;
 
-  // @Exclude()
+  @Exclude()
   password: string;
 
   role: Role;

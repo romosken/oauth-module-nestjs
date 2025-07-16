@@ -42,12 +42,9 @@ export class UsersService {
   private async create(dto: CreateUserDto) {
     const user = User.fromCreateDto(dto);
 
-    return this.repository
-      .save(user)
-      .then((entity) => new UserResponseDto(entity))
-      .catch(() => {
-        throw new ConflictException("This email is already registered!");
-      });
+    return this.saveAndConvertToResponse(user).catch(() => {
+      throw new ConflictException("This email is already registered!");
+    });
   }
 
   async changePassword(id: string, dto: ChangeUserPasswordDto) {
@@ -67,6 +64,10 @@ export class UsersService {
   ) {
     const user = await this.getExistingEntity({ id });
     const changedUser = await changeParameterFunc(user);
+    return this.saveAndConvertToResponse(changedUser);
+  }
+
+  private async saveAndConvertToResponse(changedUser: User) {
     return this.repository
       .save(changedUser)
       .then((entity) => new UserResponseDto(entity));
