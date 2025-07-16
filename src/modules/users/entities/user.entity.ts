@@ -4,9 +4,11 @@ import {
   Column,
   UpdateDateColumn,
   DeleteDateColumn,
+  CreateDateColumn,
 } from "typeorm";
 import { CreateUserDto } from "../dto/create-user.dto";
-import { UserResponseDto } from "../dto/user-response.dto";
+import { Role } from "./role.enum";
+import { Exclude } from "class-transformer";
 
 @Entity({ name: "users" })
 export class User {
@@ -16,11 +18,15 @@ export class User {
   @Column({ unique: true, length: 50 })
   email: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 60 })
+  @Exclude()
   password: string;
 
-  // @ManyToOne(() => Role, (r) => r.id)
-  // role: Role;
+  @Column({ enum: Role, default: Role.User })
+  role: Role;
+
+  @CreateDateColumn({ name: "created_at" })
+  createdAt: Date;
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
@@ -34,5 +40,4 @@ export class User {
     entity.password = dto.password;
     return entity;
   }
-
 }

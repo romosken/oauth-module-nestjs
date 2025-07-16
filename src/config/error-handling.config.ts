@@ -8,7 +8,6 @@ import {
 } from "@nestjs/common";
 import { HttpAdapterHost } from "@nestjs/core";
 import ErrorDto from "./error.dto";
-import { QueryFailedError } from "typeorm";
 import HttpExceptionDto from "./http-exception.dto";
 
 const logger = new Logger("ExceptionHandler");
@@ -16,6 +15,7 @@ const logger = new Logger("ExceptionHandler");
 function logError(exception: Error) {
   logger.error(`${exception.name}: ${exception.message}`);
 }
+
 function buildErrorDto(
   status: number,
   url: string,
@@ -26,23 +26,37 @@ function buildErrorDto(
   return new ErrorDto(status, url, messageArray);
 }
 
+function handleException(
+  exception: Error,
+  httpAdapterHost: HttpAdapterHost,
+  host: ArgumentsHost,
+  httpStatus: number,
+  message: string[],
+) {
+  logError(exception);
+
+  const { httpAdapter } = httpAdapterHost;
+
+  const ctx = host.switchToHttp();
+
+  const url = String(httpAdapter.getRequestUrl(ctx.getRequest()));
+
+  const responseBody = buildErrorDto(httpStatus, url, message);
+
+  httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+}
 @Catch()
 class BaseErrorHandler implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: Error, host: ArgumentsHost): void {
-    logError(exception);
-
-    const { httpAdapter } = this.httpAdapterHost;
-
-    const ctx = host.switchToHttp();
-
-    const httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-
-    const url = String(httpAdapter.getRequestUrl(ctx.getRequest()));
-    const responseBody = buildErrorDto(httpStatus, url, exception.message);
-
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    handleException(
+      exception,
+      this.httpAdapterHost,
+      host,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      [exception.message],
+    );
   }
 }
 
@@ -51,43 +65,26 @@ class HttpErrorHandler implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: HttpException, host: ArgumentsHost): void {
-    logError(exception);
-
     const exResponse = exception.getResponse();
 
-    const exceptionObj: HttpExceptionDto = new HttpExceptionDto(exResponse);
+    const treatedResponse =
+      typeof exResponse === "string"
+        ? {
+            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: [exResponse],
+          }
+        : exResponse;
 
-    const { httpAdapter } = this.httpAdapterHost;
+    const exceptionObj = new HttpExceptionDto(treatedResponse);
 
-    const ctx = host.switchToHttp();
-
-    const httpStatus = exceptionObj.statusCode;
-
-    const url = String(httpAdapter.getRequestUrl(ctx.getRequest()));
-    const responseBody = buildErrorDto(httpStatus, url, exceptionObj.message);
-
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    handleException(
+      exception,
+      this.httpAdapterHost,
+      host,
+      exceptionObj.statusCode,
+      exceptionObj.message,
+    );
   }
 }
 
-@Catch(QueryFailedError)
-class DuplicateEntityErrorHandler implements ExceptionFilter {
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
-
-  catch(exception: QueryFailedError, host: ArgumentsHost): void {
-    logError(exception);
-
-    const { httpAdapter } = this.httpAdapterHost;
-
-    const ctx = host.switchToHttp();
-
-    const httpStatus = HttpStatus.CONFLICT;
-
-    const url = String(httpAdapter.getRequestUrl(ctx.getRequest()));
-    const responseBody = buildErrorDto(httpStatus, url, exception.message);
-
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
-  }
-}
-
-export { BaseErrorHandler, DuplicateEntityErrorHandler, HttpErrorHandler };
+export { BaseErrorHandler, HttpErrorHandler };

@@ -4,7 +4,7 @@ import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm";
 
 @Injectable()
 export default class DatabaseConfig implements TypeOrmOptionsFactory {
-  constructor(private config: ConfigService) {}
+  constructor(private readonly config: ConfigService) {}
 
   createTypeOrmOptions(connectionName?: string): TypeOrmModuleOptions {
     return {
@@ -14,7 +14,7 @@ export default class DatabaseConfig implements TypeOrmOptionsFactory {
       username: this.config.get<string>("DATABASE_USER"),
       password: this.config.get<string>("DATABASE_PASSWORD"),
       database: this.config.get<string>("DATABASE_NAME"),
-      entities: [__dirname + "/**/*.entity{.ts,.js}"],
+      // entities: [__dirname + "/**/*.entity{.ts,.js}"],
       migrationsTableName: "migrations",
       migrations: ["src/migrations/*{.ts,.js}"],
       autoLoadEntities: true,

@@ -1,14 +1,14 @@
-import { HttpAdapterHost, NestFactory } from "@nestjs/core";
+import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ValidationPipe } from "@nestjs/common";
-import {
-  BaseErrorHandler,
-  DuplicateEntityErrorHandler,
-  HttpErrorHandler,
-} from "./config/error-handling.config";
+import { INestApplication, ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  putGlobalPipes(app);
+  await app.listen(process.env.PORT || 3000);
+}
+
+function putGlobalPipes(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -16,12 +16,14 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  const httpAdapter = app.get(HttpAdapterHost);
-  app.useGlobalFilters(
-    new BaseErrorHandler(httpAdapter),
-    new DuplicateEntityErrorHandler(httpAdapter),
-    new HttpErrorHandler(httpAdapter),
-  );
-  await app.listen(process.env.PORT ?? 3000);
 }
+
+// function putGlobalFilters(app: INestApplication) {
+//   const httpAdapter = app.get(HttpAdapterHost);
+//   app.useGlobalFilters(
+//     new BaseErrorHandler(httpAdapter),
+//     new HttpErrorHandler(httpAdapter),
+//   );
+// }
+
 bootstrap();
