@@ -1,5 +1,5 @@
 import { ClassSerializerInterceptor, Module } from "@nestjs/common";
-import { UsersModule } from "./modules/users/users.module";
+import { UsersModule } from "./users/users.module";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import DatabaseConfig from "./config/database.config";
@@ -9,7 +9,6 @@ import {
   BaseErrorHandler,
   HttpErrorHandler,
 } from "./config/error-handling.config";
-import { AuthModule } from "./modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -22,7 +21,6 @@ import { AuthModule } from "./modules/auth/auth.module";
     }),
 
     UsersModule,
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [

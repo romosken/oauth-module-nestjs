@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Length } from "class-validator";
-import { SignInDto } from "../../auth/dto/signin.dto";
+import { SignInDto } from "./signin.dto";
 
 export class CreateUserDto {
   constructor(signIn: SignInDto) {

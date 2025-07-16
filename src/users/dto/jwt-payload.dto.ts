@@ -1,4 +1,4 @@
-import { Role } from "src/modules/users/entities/role.enum";
+import { Role } from "src/users/entities/role.enum";
 
 export default class JwtPayload {
   constructor(sub: string, role: Role, exp: number) {

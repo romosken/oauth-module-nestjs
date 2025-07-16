@@ -9,8 +9,9 @@ import {
   Patch,
   Body,
 } from "@nestjs/common";
-import { UsersService } from "./users.service";
-import { ChangeUserRoleDto } from "./dto/change-user-role.dto";
+import { UsersService } from "../service/users.service";
+import { ChangeUserRoleDto } from "../dto/change-user-role.dto";
+import { ChangeUserPasswordDto } from "../dto/change-user-password.dto copy";
 
 @Controller("users")
 export class UsersController {
@@ -26,12 +27,20 @@ export class UsersController {
     return this.service.findById(id);
   }
 
-  @Patch(":id/roles")
+  @Patch(":id")
   async changeRole(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: ChangeUserRoleDto,
   ) {
     return this.service.changeRole(id, dto.role);
+  }
+
+  @Patch(":id/change_password")
+  async changePassword(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: ChangeUserPasswordDto,
+  ) {
+    return await this.service.changePassword(id, dto);
   }
 
   @Delete(":id")
