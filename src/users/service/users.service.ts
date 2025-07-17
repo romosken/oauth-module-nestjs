@@ -9,7 +9,7 @@ import { FindOptionsWhere, Repository } from "typeorm";
 import { User } from "../entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserResponseDto } from "../dto/user-response.dto";
-import { Role } from "../entities/role.enum";
+import { Role } from "../enums/role.enum";
 import { AuthService } from "./auth.service";
 import { LoginResponseDto } from "../dto/login-response.dto";
 import { LoginDto } from "../dto/login.dto";
@@ -29,8 +29,8 @@ export class UsersService {
       const user = await this.findByEmail(dto.email);
       await this.authService.validatePassword(dto.password, user.password);
       return this.authService.generateTokenResponse(user);
-    } catch (error) {
-      throw new UnauthorizedException("The credentials are wrong!");
+    } catch {
+      throw new UnauthorizedException("Invalid credentials!");
     }
   }
 
@@ -104,7 +104,9 @@ export class UsersService {
   }
 
   private async getExistingEntity(query: FindOptionsWhere<User>) {
-    return this.validateEntity(await this.repository.findOneBy(query));
+    return this.validateEntity(
+      await this.repository.findOne({ where: query, withDeleted: true }),
+    );
   }
 
   private validateEntity(entity: User | null) {

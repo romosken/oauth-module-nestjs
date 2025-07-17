@@ -4,11 +4,14 @@ import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import DatabaseConfig from "./config/database.config";
 import { AppController } from "./app.controller";
-import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import {
   BaseErrorHandler,
   HttpErrorHandler,
 } from "./config/error-handling.config";
+import { AuthGuard } from "./users/guards/auth.guard";
+import { RoleGuard } from "./users/guards/role.guard";
+import { UserGuard } from "./users/guards/user.guard";
 
 @Module({
   imports: [
@@ -35,6 +38,18 @@ import {
     {
       provide: APP_FILTER,
       useClass: HttpErrorHandler,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: UserGuard,
     },
   ],
 })

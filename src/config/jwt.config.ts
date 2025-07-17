@@ -10,9 +10,6 @@ export default class JwtConfig implements JwtOptionsFactory {
     return {
       global: true,
       secret: this.config.get<string>("JWT_SECRET"),
-      // signOptions: {
-      //   expiresIn: 3600,
-      // },
     };
   }
 }

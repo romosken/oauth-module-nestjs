@@ -1,10 +1,15 @@
-import { NestFactory } from "@nestjs/core";
+import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
+import {
+  BaseErrorHandler,
+  HttpErrorHandler,
+} from "./config/error-handling.config";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   putGlobalPipes(app);
+  // putGlobalFilters(app);
   await app.listen(process.env.PORT || 3000);
 }
 

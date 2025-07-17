@@ -5,14 +5,26 @@ import * as bcrypt from "bcrypt";
 import { UserResponseDto } from "../dto/user-response.dto";
 import { JwtService } from "@nestjs/jwt";
 import JwtPayload from "../dto/jwt-payload.dto";
-import { Role } from "../entities/role.enum";
+import { Role } from "../enums/role.enum";
+import { Request } from "express";
 
 @Injectable()
 export class AuthService {
+  private readonly tokenType: string;
+  // private readonly jwtSecret: string;
+  private readonly accessExpiration: number;
+  private readonly refreshExpiration: number;
+  private readonly bcryptRounds: number;
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+    this.tokenType = String(this.config.get("JWT_TYPE"));
+    this.accessExpiration = +this.config.get("ACCESS_TOKEN_EXPIRATION")!;
+    this.refreshExpiration = +this.config.get("REFRESH_TOKEN_EXPIRATION")!;
+    this.bcryptRounds = +this.config.get("BCRYPT_ROUNDS")!;
+  }
 
   async validatePassword(validate: string, correct: string) {
     if (!(await bcrypt.compare(validate, correct)))
@@ -20,27 +32,23 @@ export class AuthService {
   }
 
   generateTokenResponse(user: UserResponseDto) {
-    const accessTokenExpiration = +this.config.get("ACCESS_TOKEN_EXPIRATION")!;
     const accessToken = this.generateJwt(
       user.id,
       user.role,
-      accessTokenExpiration,
+      this.accessExpiration,
     );
 
-    const refreshTokenExpiration = +this.config.get(
-      "REFRESH_TOKEN_EXPIRATION",
-    )!;
     const refreshToken = this.generateJwt(
       user.id,
       user.role,
-      refreshTokenExpiration,
+      this.refreshExpiration,
     );
 
     return new LoginResponseDto(
       accessToken,
       refreshToken,
-      accessTokenExpiration,
-      String(this.config.get("JWT_TYPE")),
+      this.accessExpiration,
+      this.tokenType,
     );
   }
 
@@ -50,7 +58,27 @@ export class AuthService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    const rounds: number = +this.config.get<number>("BCRYPT_ROUNDS")!;
-    return bcrypt.hash(password, rounds);
+    return bcrypt.hash(password, this.bcryptRounds);
+  }
+
+  async validateTokenAndGetPayload(request: Request) {
+    try {
+      const token = this.extractTokenFromHeader(request);
+      return await this.getValidatedPayload(token);
+    } catch {
+      throw new UnauthorizedException("Authorization missing or invalid!");
+    }
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(" ") ?? [];
+    return type === this.tokenType ? token : undefined;
+  }
+
+  private async getValidatedPayload(token: string | undefined) {
+    const payload = await this.jwtService.verifyAsync<JwtPayload>(token!);
+    const now = new Date().valueOf();
+    if (payload.exp < now) throw new UnauthorizedException();
+    return payload;
   }
 }

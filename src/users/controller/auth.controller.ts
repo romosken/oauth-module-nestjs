@@ -4,8 +4,10 @@ import { LoginResponseDto } from "../dto/login-response.dto";
 import { SignInDto } from "../dto/signin.dto";
 import { UserResponseDto } from "../dto/user-response.dto";
 import { UsersService } from "../service/users.service";
+import { BypassAuth } from "../decorators/bypass-auth.decorator";
 
 @Controller("auth")
+@BypassAuth()
 export class AuthController {
   constructor(private readonly service: UsersService) {}
 

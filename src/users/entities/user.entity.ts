@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
 } from "typeorm";
 import { CreateUserDto } from "../dto/create-user.dto";
-import { Role } from "./role.enum";
+import { Role } from "../enums/role.enum";
 import { Exclude } from "class-transformer";
 
 @Entity({ name: "users" })

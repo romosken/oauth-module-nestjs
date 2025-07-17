@@ -1,6 +1,6 @@
 import { Exclude, Expose } from "class-transformer";
 import { User } from "../entities/user.entity";
-import { Role } from "../entities/role.enum";
+import { Role } from "../enums/role.enum";
 
 export class UserResponseDto {
   constructor(entity: User) {
