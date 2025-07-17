@@ -5,6 +5,7 @@ import { Role } from "../enums/role.enum";
 @Injectable()
 export class UserGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    //TODO think way to admin to have access to only his user in some routes (ex: change password)
     const { user, params } = context
       .switchToHttp()
       .getRequest<RequestWithUser>();

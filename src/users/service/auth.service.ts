@@ -8,10 +8,11 @@ import JwtPayload from "../dto/jwt-payload.dto";
 import { Role } from "../enums/role.enum";
 import { Request } from "express";
 
+//TODO extract to other module
+
 @Injectable()
 export class AuthService {
   private readonly tokenType: string;
-  // private readonly jwtSecret: string;
   private readonly accessExpiration: number;
   private readonly refreshExpiration: number;
   private readonly bcryptRounds: number;
@@ -65,7 +66,7 @@ export class AuthService {
     try {
       const token = this.extractTokenFromHeader(request);
       return await this.getValidatedPayload(token);
-    } catch {
+    } catch (e) {
       throw new UnauthorizedException("Authorization missing or invalid!");
     }
   }
