@@ -2,6 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm";
 
+
+//TODO add secrets manager reading
+
+
 @Injectable()
 export default class DatabaseConfig implements TypeOrmOptionsFactory {
   constructor(private readonly config: ConfigService) {}
