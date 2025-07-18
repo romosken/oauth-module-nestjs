@@ -4,17 +4,17 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { CreateUserDto } from "../dto/create-user.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
 import { FindOptionsWhere, Repository } from "typeorm";
-import { User } from "../entities/user.entity";
+import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserResponseDto } from "../dto/user-response.dto";
-import { Role } from "../enums/role.enum";
-import { AuthService } from "./auth.service";
-import { LoginResponseDto } from "../dto/login-response.dto";
-import { LoginDto } from "../dto/login.dto";
-import { SignInDto } from "../dto/signin.dto";
-import { ChangeUserPasswordDto } from "../dto/change-user-password.dto copy";
+import { UserResponseDto } from "./dto/user-response.dto";
+import { Role } from "./enums/role.enum";
+import { LoginResponseDto } from "./auth/dto/login-response.dto";
+import { LoginDto } from "./auth/dto/login.dto";
+import { SignInDto } from "./auth/dto/signin.dto";
+import { ChangeUserPasswordDto } from "./dto/change-user-password.dto copy";
+import { AuthService } from "src/users/auth/auth.service";
 
 @Injectable()
 export class UsersService {

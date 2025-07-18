@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { RequestWithUser } from "./request-with-user.dto";
-import { Role } from "../enums/role.enum";
+import { RequestWithUser } from "../dto/request-with-user.dto";
+import { Role } from "../../enums/role.enum";
 
 @Injectable()
 export class UserGuard implements CanActivate {

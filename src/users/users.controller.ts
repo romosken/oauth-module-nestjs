@@ -9,11 +9,11 @@ import {
   Patch,
   Body,
 } from "@nestjs/common";
-import { UsersService } from "../service/users.service";
-import { ChangeUserRoleDto } from "../dto/change-user-role.dto";
-import { ChangeUserPasswordDto } from "../dto/change-user-password.dto copy";
-import { Roles } from "../decorators/roles.decorator";
-import { Role } from "../enums/role.enum";
+import { UsersService } from "./users.service";
+import { ChangeUserRoleDto } from "./dto/change-user-role.dto";
+import { ChangeUserPasswordDto } from "./dto/change-user-password.dto copy";
+import { Role } from "./enums/role.enum";
+import { Roles } from "src/users/auth/decorators/roles.decorator";
 
 @Controller("users")
 export class UsersController {

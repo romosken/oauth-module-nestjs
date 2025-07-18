@@ -9,9 +9,9 @@ import {
   BaseErrorHandler,
   HttpErrorHandler,
 } from "./config/error-handling.config";
-import { AuthGuard } from "./users/guards/auth.guard";
-import { RoleGuard } from "./users/guards/role.guard";
-import { UserGuard } from "./users/guards/user.guard";
+import { AuthGuard } from "./users/auth/guards/auth.guard";
+import { RoleGuard } from "./users/auth/guards/role.guard";
+import { UserGuard } from "./users/auth/guards/user.guard";
 
 @Module({
   imports: [

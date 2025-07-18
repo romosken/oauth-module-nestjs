@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { AuthService } from "../service/auth.service";
 import { BypassAuth } from "../decorators/bypass-auth.decorator";
 import { Reflector } from "@nestjs/core";
-import { RequestWithUser } from "./request-with-user.dto";
+import { AuthService } from "../auth.service";
+import { RequestWithUser } from "../dto/request-with-user.dto";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,7 +15,8 @@ export class AuthGuard implements CanActivate {
     if (this.checkBypass(context)) return true;
 
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const payload = await this.service.validateTokenAndGetPayload(request);
+    const payload =
+      await this.service.validateAccessTokenAndGetPayload(request);
 
     request.user = payload;
     return true;
