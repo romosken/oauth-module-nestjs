@@ -13,7 +13,7 @@ import { AuthService } from "src/users/auth/auth.service";
   imports: [
     TypeOrmModule.forFeature([User]),
 
-    UsersModule,
+    UsersModule, //TODO: verificar se é necessario
     JwtModule.registerAsync({
       useClass: JwtConfig,
     }),

@@ -45,6 +45,9 @@ function handleException(
 
   httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
 }
+
+
+
 @Catch()
 class BaseErrorHandler implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
